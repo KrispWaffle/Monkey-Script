@@ -1,19 +1,15 @@
 import Parser from "./frontOfMonkey/parser.ts";
+import { createGlobalEnv } from "./monkeyRuntime/env.ts";
+import { evaluate } from "./monkeyRuntime/interpreter.ts";
 
-monkeyScript();
+runMonkey("./main.bs");
 
-function monkeyScript() {
-  const parser = new Parser();
-  console.log("\n MonkeyScript v0.1");
+async function runMonkey(filename: string) {
+	const parser = new Parser();
+	const env = createGlobalEnv();
 
-  while (true) {
-    const input = prompt("> ");
-  
-    if (!input || input.includes("exit")) {
-      Deno.exit(1);
-    }
+	const input = await Deno.readTextFile(filename);
+	const program = parser.produceAST(input);
 
-    const program = parser.produceAST(input);
-    console.log(program);
-  }
+	const result = evaluate(program, env);
 }
